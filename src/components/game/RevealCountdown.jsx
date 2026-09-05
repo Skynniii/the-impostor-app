@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Eye, Trophy, Skull, Home, EyeOff } from "lucide-react";
+import { Eye, Trophy, Skull, Home, EyeOff, ArrowRight, Check, X } from "lucide-react";
 import sounds from "@/lib/sounds";
 
 export default function RevealCountdown({ result, roles, names, onDone, onRestart, seconds = 3 }) {
@@ -8,6 +8,7 @@ export default function RevealCountdown({ result, roles, names, onDone, onRestar
   const isFinalScreen = outcome === "normals" || outcome === "impostors" || outcome === "allImpostors";
   const [count, setCount] = useState(seconds);
   const [showResult, setShowResult] = useState(false);
+  const [showElimination, setShowElimination] = useState(false);
 
   const eliminatedIndexes = result?.eliminated || [];
   const selectedNames = eliminatedIndexes.map(i => names[i]).filter(Boolean);
@@ -22,9 +23,8 @@ export default function RevealCountdown({ result, roles, names, onDone, onRestar
       if (isFinalScreen) {
         setShowResult(true);
         win ? sounds?.win?.() : sounds?.lose?.();
-      } else if (onDone) {
-        const t = setTimeout(onDone, 400);
-        return () => clearTimeout(t);
+      } else {
+        setShowElimination(true);
       }
       return;
     }
@@ -35,12 +35,12 @@ export default function RevealCountdown({ result, roles, names, onDone, onRestar
     }, 1000);
 
     return () => clearTimeout(id);
-  }, [count, isFinalScreen, win, onDone]);
+  }, [count, isFinalScreen, win]);
 
   return (
     <main className="flex min-h-screen items-center justify-center px-5 py-10">
       <AnimatePresence mode="wait">
-        {!showResult ? (
+        {!showResult && !showElimination ? (
           <motion.div
             key="countdown-card"
             initial={{ scale: 0.9, opacity: 0 }}
@@ -87,6 +87,33 @@ export default function RevealCountdown({ result, roles, names, onDone, onRestar
             </div>
 
             <p className="text-sm font-bold text-slate-400">Preparando el resultado…</p>
+          </motion.div>
+        ) : showElimination ? (
+          <motion.div
+            key="elimination-result"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="w-full max-w-lg rounded-[2.5rem] border border-white/70 bg-white/60 p-7 text-center shadow-2xl backdrop-blur-xl sm:p-9"
+          >
+            <div className="mx-auto grid h-20 w-20 place-items-center rounded-3xl bg-gradient-to-br from-amber-400 to-rose-500 text-white shadow-lg shadow-orange-200">
+              <ArrowRight size={40} />
+            </div>
+            <h1 className="mt-5 text-3xl font-black text-amber-500">Aún no han descubierto a todos los impostores</h1>
+            <p className="mt-2 text-slate-500">Estos jugadores quedan eliminados</p>
+            <div className="my-6 space-y-2">
+              {eliminatedIndexes.map(i => (
+                <div key={i} className={`flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 font-bold ${roles[i]?.impostor ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-600"}`}>
+                  {names[i]} {roles[i]?.impostor ? <><Check size={16} /> era impostor</> : <><X size={16} /> no era impostor</>}
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => { sounds?.click?.(); onDone?.(); }}
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-violet-600 px-5 py-4 font-black text-white transition hover:bg-violet-700"
+            >
+              <ArrowRight size={19} />
+              Continuar
+            </button>
           </motion.div>
         ) : (
           <motion.div

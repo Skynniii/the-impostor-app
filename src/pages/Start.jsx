@@ -58,7 +58,7 @@ export default function Start() {
       <motion.footer initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="relative mt-10 text-center">
         <div className="flex items-center justify-center gap-1.5">
           <Code size={16} className="text-violet-500" />
-          <span className="text-sm font-black text-slate-700">DevSky</span>
+          <span className="text-sm font-black text-slate-700">DevEskay</span>
         </div>
         <p className="text-xs text-slate-400">By Jesús Villadiego</p>
       </motion.footer>

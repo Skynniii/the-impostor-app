@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { VenetianMask } from "lucide-react";
+import { VenetianMask, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import GameSetup from "@/components/game/GameSetup";
 import { useGame } from "@/lib/GameContext";
@@ -40,6 +40,9 @@ export default function GameSetupPage() {
       <div className="pointer-events-none fixed -right-20 bottom-10 h-80 w-80 rounded-full bg-cyan-300/40 blur-3xl" />
 
       <div className="relative mx-auto max-w-lg">
+        <button onClick={() => { sounds.click(); navigate("/"); }} className="mb-4 flex items-center gap-2 rounded-xl bg-white/70 px-4 py-2.5 font-bold text-slate-700 shadow-lg backdrop-blur-xl transition active:scale-95">
+          <ArrowLeft size={18} /> Volver al Menú
+        </button>
         <motion.header initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="mb-7 text-center">
           <span className="mx-auto mb-4 grid h-16 w-16 rotate-3 place-items-center rounded-[1.4rem] bg-slate-900 text-white shadow-xl"><VenetianMask size={33} /></span>
           <p className="text-sm font-black uppercase tracking-[.28em] text-violet-600">Preparar partida</p>
