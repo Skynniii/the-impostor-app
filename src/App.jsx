@@ -6,8 +6,14 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
-// Add page imports here
-import Home from '@/pages/Home';
+import { GameProvider } from '@/lib/GameContext';
+import Start from '@/pages/Start';
+import CategoriesPage from '@/pages/CategoriesPage';
+import HistoryPage from '@/pages/HistoryPage';
+import SettingsPage from '@/pages/SettingsPage';
+import GameSetupPage from '@/pages/GameSetupPage';
+import CategorySelectPage from '@/pages/CategorySelectPage';
+import GamePlayPage from '@/pages/GamePlayPage';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -35,8 +41,13 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      {/* Add your page Route elements here */}
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<Start />} />
+      <Route path="/categorias" element={<CategoriesPage />} />
+      <Route path="/historial" element={<HistoryPage />} />
+      <Route path="/configuracion" element={<SettingsPage />} />
+      <Route path="/jugar" element={<GameSetupPage />} />
+      <Route path="/jugar/categoria" element={<CategorySelectPage />} />
+      <Route path="/jugar/partida" element={<GamePlayPage />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
@@ -48,11 +59,13 @@ function App() {
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
-        <Router>
-          <ScrollToTop />
-          <AuthenticatedApp />
-        </Router>
-        <Toaster />
+        <GameProvider>
+          <Router>
+            <ScrollToTop />
+            <AuthenticatedApp />
+          </Router>
+          <Toaster />
+        </GameProvider>
       </QueryClientProvider>
     </AuthProvider>
   )

@@ -22,7 +22,7 @@ function Toggle({ label, active, onClick, hint }) {
   </>;
 }
 
-export default function GameSetup({ players, setPlayers, impostors, setImpostors, names, setNames, showHints, setShowHints, matchMinutes, setMatchMinutes, randomImpostors, setRandomImpostors, wordCount, onStart }) {
+export default function GameSetup({ players, setPlayers, impostors, setImpostors, names, setNames, showHints, setShowHints, matchMinutes, setMatchMinutes, randomImpostors, setRandomImpostors, allImpostors, setAllImpostors, onStart, buttonText = "¡Empezar partida!" }) {
   const soundOn = isSoundEnabled();
   return <section className="rounded-[2rem] border border-white/60 bg-white/45 p-5 shadow-xl shadow-violet-200/40 backdrop-blur-xl sm:p-7">
     <div className="mb-5 flex items-center gap-3"><span className="grid h-11 w-11 place-items-center rounded-2xl bg-violet-600 text-white"><Sparkles size={21}/></span><div><h2 className="text-xl font-black">Preparar partida</h2><p className="text-sm text-slate-500">Configura el grupo y empieza</p></div></div>
@@ -33,11 +33,12 @@ export default function GameSetup({ players, setPlayers, impostors, setImpostors
     </div>
     <Toggle label="Mostrar pistas" active={showHints} onClick={() => { sounds.toggle(); setShowHints(v => !v); }}/>
     <Toggle label="Impostores aleatorios" active={randomImpostors} onClick={() => { sounds.toggle(); setRandomImpostors(v => !v); }} hint="El número de impostores será sorpresa (máx. la mitad del grupo)"/>
+    <Toggle label="Todos impostores" active={allImpostors} onClick={() => { sounds.toggle(); setAllImpostors(v => !v); }} hint="10% de probabilidad de que nadie conozca la palabra"/>
     <button onClick={() => { const on = !soundOn; setSoundEnabled(on); if (on) sounds.click(); }} className="mt-3 flex w-full items-center justify-between rounded-2xl bg-white/70 p-4">
       <span className="font-bold text-slate-700">Sonidos</span>
       <span className="grid h-7 w-7 place-items-center text-slate-600">{soundOn ? <Volume2 size={20}/> : <VolumeX size={20}/>}</span>
     </button>
     <div className="mt-4 space-y-2"><p className="text-sm font-bold text-slate-500">Nombres de los jugadores</p>{names.map((name, i) => <input key={i} value={name} onChange={e => setNames(prev => prev.map((n, idx) => idx === i ? e.target.value.slice(0, 18) : n))} placeholder={`Jugador ${i + 1}`} className="w-full rounded-xl border-2 border-white bg-white/80 px-4 py-2.5 font-semibold outline-none transition focus:border-violet-400"/>)}</div>
-    <button disabled={!wordCount} onClick={() => { sounds.start(); onStart(); }} className="mt-5 w-full rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-5 py-4 text-lg font-black text-white shadow-lg shadow-fuchsia-300/40 transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40">{wordCount ? "¡Empezar partida!" : "Añade una palabra"}</button>
+    <button onClick={() => { sounds.start(); onStart(); }} className="mt-5 w-full rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-5 py-4 text-lg font-black text-white shadow-lg shadow-fuchsia-300/40 transition hover:-translate-y-0.5 active:scale-95">{buttonText}</button>
   </section>;
 }
