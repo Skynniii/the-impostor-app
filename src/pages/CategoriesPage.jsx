@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Plus, Trash2, ChevronDown, Tags, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, ChevronDown, Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useGame } from "@/lib/GameContext";
 import sounds from "@/lib/sounds";
+
+const EMOJI_CHOICES = ["📝", "🎬", "🎵", "🎮", "🧪", "🏛️", "🎭", "🎨", "📚", "🔬", "💡", "🌟", "🎯", "🎲", "🧩", "♟️", "🎪", "🎁", "💎", "🔥", "👽", "🤖", "🎸", "📷", "🌈", "⚡", "🌙", "☀️", "🏆", "🧠"];
 
 export default function CategoriesPage() {
   const navigate = useNavigate();
@@ -15,6 +17,7 @@ export default function CategoriesPage() {
   const [expanded, setExpanded] = useState(null);
   const [showWords, setShowWords] = useState(true);
   const [newCatName, setNewCatName] = useState("");
+  const [newCatEmoji, setNewCatEmoji] = useState("📝");
   const [showNewCat, setShowNewCat] = useState(false);
   const [wordInputs, setWordInputs] = useState({});
 
@@ -28,8 +31,9 @@ export default function CategoriesPage() {
     e.preventDefault();
     const name = newCatName.trim();
     if (!name) return;
-    const cat = addCategory(name);
+    const cat = addCategory(name, newCatEmoji);
     setNewCatName("");
+    setNewCatEmoji("📝");
     setShowNewCat(false);
     setExpanded(cat.id);
     sounds.select();
@@ -68,13 +72,21 @@ export default function CategoriesPage() {
               initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}
               onSubmit={handleAddCat} className="mb-3 overflow-hidden"
             >
-              <div className="flex gap-2 rounded-2xl border border-white/60 bg-white/70 p-3 shadow-lg backdrop-blur-xl">
+              <div className="space-y-2 rounded-2xl border border-white/60 bg-white/70 p-3 shadow-lg backdrop-blur-xl">
                 <input
                   value={newCatName} onChange={e => setNewCatName(e.target.value)} maxLength={30}
                   placeholder="Nombre de la categoría" autoFocus
-                  className="flex-1 rounded-xl border-2 border-white bg-white/80 px-4 py-2.5 font-semibold outline-none focus:border-violet-400"
+                  className="w-full rounded-xl border-2 border-white bg-white/80 px-4 py-2.5 font-semibold outline-none focus:border-violet-400"
                 />
-                <button type="submit" className="rounded-xl bg-violet-600 px-4 py-2.5 font-bold text-white transition active:scale-95">Crear</button>
+                <div className="flex flex-wrap gap-1.5">
+                  {EMOJI_CHOICES.map(emoji => (
+                    <button key={emoji} type="button" onClick={() => { sounds.select(); setNewCatEmoji(emoji); }}
+                      className={`grid h-9 w-9 place-items-center rounded-lg text-xl transition ${newCatEmoji === emoji ? "bg-violet-200 ring-2 ring-violet-500" : "bg-slate-100"}`}>
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+                <button type="submit" className="w-full rounded-xl bg-violet-600 px-4 py-2.5 font-bold text-white transition active:scale-95">Crear categoría</button>
               </div>
             </motion.form>
           )}
@@ -113,9 +125,27 @@ export default function CategoriesPage() {
                         </button>
                       </div>
 
+                      <div className="mb-3 space-y-2">
+                        <input
+                          value={(wordInputs[cat.id] || {}).word || ""}
+                          onChange={e => setWordInputs(prev => ({ ...prev, [cat.id]: { ...(prev[cat.id] || { word: "", hint: "" }), word: e.target.value } }))}
+                          maxLength={40} placeholder="Palabra"
+                          className="w-full rounded-xl border-2 border-white bg-white/80 px-4 py-2.5 font-semibold outline-none focus:border-violet-400"
+                        />
+                        <input
+                          value={(wordInputs[cat.id] || {}).hint || ""}
+                          onChange={e => setWordInputs(prev => ({ ...prev, [cat.id]: { ...(prev[cat.id] || { word: "", hint: "" }), hint: e.target.value } }))}
+                          maxLength={60} placeholder="Pista" onKeyDown={e => { if (e.key === "Enter") handleAddWord(cat.id); }}
+                          className="w-full rounded-xl border-2 border-white bg-white/80 px-4 py-2.5 text-sm outline-none focus:border-violet-400"
+                        />
+                        <button onClick={() => handleAddWord(cat.id)} className="flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-500 px-4 py-2.5 font-bold text-white transition hover:bg-cyan-600 active:scale-95">
+                          <Plus size={18} /> Añadir palabra
+                        </button>
+                      </div>
+
                       {showWords && (
-                        <div className="mb-3 max-h-64 space-y-2 overflow-y-auto pr-1">
-                          {cat.words.length === 0 && <p className="py-4 text-center text-sm text-slate-400">Sin palabras. Añade la primera abajo.</p>}
+                        <div className="max-h-48 space-y-2 overflow-y-auto pr-1">
+                          {cat.words.length === 0 && <p className="py-4 text-center text-sm text-slate-400">Sin palabras todavía</p>}
                           {cat.words.map((item, wi) => (
                             <div key={wi} className="rounded-xl bg-white/70 px-3 py-2.5">
                               <div className="flex items-center justify-between">
@@ -133,22 +163,6 @@ export default function CategoriesPage() {
                           ))}
                         </div>
                       )}
-
-                      <div className="flex gap-2">
-                        <input
-                          value={(wordInputs[cat.id] || {}).word || ""} onChange={e => setWordInputs(prev => ({ ...prev, [cat.id]: { ...(prev[cat.id] || { word: "", hint: "" }), word: e.target.value } }))}
-                          maxLength={40} placeholder="Palabra"
-                          className="flex-1 rounded-xl border-2 border-white bg-white/80 px-3 py-2.5 font-semibold outline-none focus:border-violet-400"
-                        />
-                        <input
-                          value={(wordInputs[cat.id] || {}).hint || ""} onChange={e => setWordInputs(prev => ({ ...prev, [cat.id]: { ...(prev[cat.id] || { word: "", hint: "" }), hint: e.target.value } }))}
-                          maxLength={60} placeholder="Pista" onKeyDown={e => { if (e.key === "Enter") handleAddWord(cat.id); }}
-                          className="flex-1 rounded-xl border-2 border-white bg-white/80 px-3 py-2.5 text-sm outline-none focus:border-violet-400"
-                        />
-                        <button onClick={() => handleAddWord(cat.id)} className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-cyan-500 text-white transition active:scale-90">
-                          <Plus size={20} />
-                        </button>
-                      </div>
                     </div>
                   </motion.div>
                 )}

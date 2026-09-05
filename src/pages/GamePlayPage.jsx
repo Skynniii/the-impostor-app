@@ -5,7 +5,6 @@ import RevealScreen from "@/components/game/RevealScreen";
 import ReadyScreen from "@/components/game/ReadyScreen";
 import PlayScreen from "@/components/game/PlayScreen";
 import VotingScreen from "@/components/game/VotingScreen";
-import ResultScreen from "@/components/game/ResultScreen";
 import RevealCountdown from "@/components/game/RevealCountdown";
 
 const shuffle = list => [...list].sort(() => Math.random() - .5);
@@ -129,8 +128,7 @@ export default function GamePlayPage() {
       });
     }
 
-    if (outcome === "continue") setStage("result");
-    else setStage("finalReveal");
+    setStage("revealResult");
   };
 
   const continueRound = () => { setStarter(rand(alive)); setStage("ready"); };
@@ -140,8 +138,7 @@ export default function GamePlayPage() {
   if (stage === "ready") return <ReadyScreen name={names[starter]} onBegin={beginRound} />;
   if (stage === "play") return <PlayScreen names={aliveNames} timeLeft={timeLeft} onVote={() => { setForcedVote(false); setStage("voting"); }} />;
   if (stage === "voting") return <VotingScreen names={aliveNames} impostors={aliveImpostors} forced={forcedVote} randomImpostors={randomImpostors} onConfirm={confirmVote} />;
-  if (stage === "result") return <ResultScreen result={result} roles={roles} names={names} onContinue={continueRound} />;
-  if (stage === "finalReveal") return <RevealCountdown result={result} roles={roles} names={names} onRestart={restart} />;
+  if (stage === "revealResult") return <RevealCountdown result={result} roles={roles} names={names} onDone={continueRound} onRestart={restart} />;
 
   return null;
 }

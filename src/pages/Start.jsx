@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { VenetianMask, Play, Tags, History, Settings as SettingsIcon } from "lucide-react";
+import { VenetianMask, Play, Tags, History, Settings as SettingsIcon, Code } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import sounds from "@/lib/sounds";
 
@@ -54,6 +54,14 @@ export default function Start() {
           </button>
         </div>
       </motion.div>
+
+      <motion.footer initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="relative mt-10 text-center">
+        <div className="flex items-center justify-center gap-1.5">
+          <Code size={16} className="text-violet-500" />
+          <span className="text-sm font-black text-slate-700">DevSky</span>
+        </div>
+        <p className="text-xs text-slate-400">By Jesús Villadiego</p>
+      </motion.footer>
     </main>
   );
 }

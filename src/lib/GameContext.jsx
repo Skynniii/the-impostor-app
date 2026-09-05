@@ -44,8 +44,8 @@ export function GameProvider({ children }) {
   useEffect(() => { try { localStorage.setItem(KEYS.history, JSON.stringify(history)); } catch (e) {} }, [history]);
   useEffect(() => { try { localStorage.setItem(KEYS.settings, JSON.stringify(settings)); } catch (e) {} }, [settings]);
 
-  const addCategory = useCallback((name) => {
-    const cat = { id: `custom-${Date.now()}`, name, emoji: "📝", isDefault: false, words: [] };
+  const addCategory = useCallback((name, emoji = "📝") => {
+    const cat = { id: `custom-${Date.now()}`, name, emoji, isDefault: false, words: [] };
     setCategories(prev => [...prev, cat]);
     return cat;
   }, []);
